@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thinking With… — Coming Soon</title>
+<meta name="description" content="Thinking With… A Rhetorical Theory Podcast. Coming soon." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #faf6ee;
+    --ink: #1c1916;
+    --ink-soft: #4c4439;
+    --ink-faint: #756b5c;
+    --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --body: 'Newsreader', Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #15171a;
+      --ink: #ece3d4;
+      --ink-soft: #c3bbac;
+      --ink-faint: #938b7d;
+    }
+  }
+  * { margin: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  /* masthead: completely still */
+  .masthead {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2.75rem, 8vw, 5rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  /* rotating names: fixed-height line, gentle fade + rise + settle */
+  .thinkers {
+    height: 2.1em;
+    margin-top: 1.1rem;
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 340;
+    font-size: clamp(1.5rem, 4.2vw, 2.4rem);
+    color: var(--ink-soft);
+    position: relative;
+  }
+  .thinkers span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.45em);
+    animation: reveal 12s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  }
+  .thinkers span:nth-child(1) { animation-delay: 0s; }
+  .thinkers span:nth-child(2) { animation-delay: 2.4s; }
+  .thinkers span:nth-child(3) { animation-delay: 4.8s; }
+  .thinkers span:nth-child(4) { animation-delay: 7.2s; }
+  .thinkers span:nth-child(5) { animation-delay: 9.6s; }
+  /* 12s cycle, name every 2.4s, 0.6s crossfades: each name fades out exactly as the next fades in */
+  @keyframes reveal {
+    0%     { opacity: 0; filter: blur(6px); transform: translateY(0.45em); }
+    5%     { opacity: 1; filter: blur(0);  transform: translateY(0); }
+    20%    { opacity: 1; filter: blur(0);  transform: translateY(0); }
+    26.7%  { opacity: 0; filter: blur(6px); transform: translateY(-0.4em); }
+    100%   { opacity: 0; filter: blur(6px); transform: translateY(-0.4em); }
+  }
+
+  .rule {
+    width: 3.5rem;
+    height: 1px;
+    background: var(--ink-faint);
+    opacity: 0.5;
+    margin: 3rem auto 0;
+    animation: rule-in 1.6s 0.8s both cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  @keyframes rule-in { from { opacity: 0; width: 0; } }
+
+  .soon {
+    margin-top: 1.6rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    animation: rise 1.4s 1.2s both cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(0.6em); } }
+
+  .tag {
+    position: fixed;
+    bottom: 2rem; left: 0; right: 0;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--ink-faint);
+    animation: rise 1.4s 2s both cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thinkers span { animation: none; position: static; display: none; filter: none; transform: none; }
+    .thinkers span:nth-child(1) { display: flex; opacity: 1; }
+    .rule, .soon, .tag { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1 class="masthead">Thinking With…</h1>
+  <p class="thinkers" aria-label="thinking with the philosophers">
+    <span>Derrida</span>
+    <span>Nietzsche</span>
+    <span>Hegel</span>
+    <span>Heidegger</span>
+    <span>Deleuze</span>
+  </p>
+  <div class="rule" aria-hidden="true"></div>
+  <p class="soon">Coming Soon</p>
+</main>
+<p class="tag">A Rhetorical Theory Podcast</p>
+</body>
+</html>
