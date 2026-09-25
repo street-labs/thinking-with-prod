@@ -102,19 +102,10 @@
   }
   @keyframes rise { from { opacity: 0; transform: translateY(0.6em); } }
 
-  .tag {
-    position: fixed;
-    bottom: 2rem; left: 0; right: 0;
-    font-size: 0.95rem;
-    font-style: italic;
-    color: var(--ink-faint);
-    animation: rise 1.4s 2s both cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .thinkers span { animation: none; position: static; display: none; filter: none; transform: none; }
     .thinkers span:nth-child(1) { display: flex; opacity: 1; }
-    .rule, .soon, .tag { animation: none; }
+    .rule, .soon { animation: none; }
   }
 </style>
 </head>
@@ -131,6 +122,5 @@
   <div class="rule" aria-hidden="true"></div>
   <p class="soon">Coming Soon</p>
 </main>
-<p class="tag">A Rhetorical Theory Podcast</p>
 </body>
 </html>
