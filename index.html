@@ -102,10 +102,50 @@
   }
   @keyframes rise { from { opacity: 0; transform: translateY(0.6em); } }
 
+  /* notify form: sits below "Coming Soon", same typographic register */
+  .notify {
+    margin-top: 3rem;
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: rise 1.4s 1.6s both cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .notify input {
+    font-family: var(--body);
+    font-size: 1rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink-faint);
+    border-radius: 999px;
+    padding: 0.65rem 1.2rem;
+    width: min(18rem, 100%);
+    text-align: center;
+  }
+  .notify input::placeholder { color: var(--ink-faint); }
+  .notify input:focus { outline: 2px solid var(--ink-soft); outline-offset: 2px; }
+  .notify button {
+    font-family: var(--body);
+    font-size: 0.8rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    padding: 0.72rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .notify button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .notify button:disabled { opacity: 0.55; cursor: default; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
   @media (prefers-reduced-motion: reduce) {
     .thinkers span { animation: none; position: static; display: none; filter: none; transform: none; }
     .thinkers span:nth-child(1) { display: flex; opacity: 1; }
-    .rule, .soon { animation: none; }
+    .rule, .soon, .notify { animation: none; }
   }
 </style>
 </head>
@@ -121,6 +161,38 @@
   </p>
   <div class="rule" aria-hidden="true"></div>
   <p class="soon">Coming Soon</p>
+  <form class="notify" action="#" data-endpoint="https://thinkingwith-subscribe.leannehindman.workers.dev">
+    <label class="sr-only" for="notify-email">Email address</label>
+    <input id="notify-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email" />
+    <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <button type="submit">Notify me</button>
+  </form>
 </main>
+<script>
+  // Subscribes to the launch list (separate Resend audience; never sees the
+  // staging digest). See scripts/subscribe-proxy/worker.js, audience: 'launch'.
+  const form = document.querySelector('.notify');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = form.querySelector('input[name=email]');
+    const button = form.querySelector('button');
+    if (!input.reportValidity()) return;
+    button.disabled = true;
+    try {
+      const res = await fetch(form.dataset.endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: input.value,
+          audience: 'launch',
+          company: form.querySelector('.hp').value,
+        }),
+      });
+      button.textContent = res.ok ? "You're on the list" : 'Try again later';
+    } catch {
+      button.textContent = 'Try again later';
+    }
+  });
+</script>
 </body>
 </html>
