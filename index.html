@@ -124,7 +124,7 @@
   }
   .notify input::placeholder { color: var(--ink-faint); }
   .notify input:focus { outline: 2px solid var(--ink-soft); outline-offset: 2px; }
-  .notify button {
+  .notify button, .intro button {
     font-family: var(--body);
     font-size: 0.8rem;
     letter-spacing: 0.28em;
@@ -137,10 +137,45 @@
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
   }
-  .notify button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
-  .notify button:disabled { opacity: 0.55; cursor: default; }
+  .notify button:hover:not(:disabled), .intro button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .notify button:disabled, .intro button:disabled { opacity: 0.55; cursor: default; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* intro form: same register as the notify form */
+  .intro-wrap { margin-top: 2.2rem; animation: rise 1.4s 2s both cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .intro-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 1rem;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .intro input, .intro textarea {
+    font-family: var(--body);
+    font-size: 1rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink-faint);
+    border-radius: 999px;
+    padding: 0.65rem 1.2rem;
+    width: min(28rem, 100%);
+    text-align: center;
+  }
+  .intro textarea {
+    border-radius: 1.2rem;
+    text-align: left;
+    resize: vertical;
+    min-height: 5rem;
+  }
+  .intro ::placeholder { color: var(--ink-faint); }
+  .intro :focus { outline: 2px solid var(--ink-soft); outline-offset: 2px; }
 
   @media (prefers-reduced-motion: reduce) {
     .thinkers span { animation: none; position: static; display: none; filter: none; transform: none; }
@@ -167,6 +202,19 @@
     <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <button type="submit">Notify me</button>
   </form>
+  <div class="intro-wrap">
+    <p class="intro-title">Say hello</p>
+    <form class="intro" action="#" data-endpoint="https://thinkingwith-subscribe.leannehindman.workers.dev">
+      <label class="sr-only" for="intro-name">Your name</label>
+      <input id="intro-name" name="name" type="text" required maxlength="80" placeholder="your name" />
+      <label class="sr-only" for="intro-text">Your introduction</label>
+      <textarea id="intro-text" name="text" required maxlength="2000" placeholder="who are you, and what brought you here?"></textarea>
+      <label class="sr-only" for="intro-npub">Your npub (optional)</label>
+      <input id="intro-npub" name="npub" type="text" maxlength="80" placeholder="your npub, if you have one (optional)" spellcheck="false" />
+      <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <button type="submit" class="intro-send">Introduce yourself</button>
+    </form>
+  </div>
 </main>
 <script>
   // Subscribes to the launch list (separate Resend audience; never sees the
@@ -189,6 +237,35 @@
         }),
       });
       button.textContent = res.ok ? "You're on the list" : 'Try again later';
+    } catch {
+      button.textContent = 'Try again later';
+    }
+  });
+
+  // Intro form: posts to the worker, which relays it into the community's
+  // #intro nostr channel (scripts/subscribe-proxy/worker.js, kind: 'intro').
+  const introForm = document.querySelector('.intro');
+  introForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = introForm.querySelector('input[name=name]');
+    const text = introForm.querySelector('textarea[name=text]');
+    const npub = introForm.querySelector('input[name=npub]');
+    const button = introForm.querySelector('button');
+    if (!name.reportValidity() || !text.reportValidity()) return;
+    button.disabled = true;
+    try {
+      const res = await fetch(introForm.dataset.endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'intro',
+          name: name.value,
+          text: text.value,
+          npub: npub.value,
+          company: introForm.querySelector('.hp').value,
+        }),
+      });
+      button.textContent = res.ok ? 'Sent - we will say hello back' : 'Try again later';
     } catch {
       button.textContent = 'Try again later';
     }
